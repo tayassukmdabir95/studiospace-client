@@ -48,9 +48,20 @@ export default function LoginPage() {
     try {
       await login(formData.email.trim(), formData.password);
 
-      toast.success("Welcome back to StudioSpace!");
-      router.replace("/");
-      router.refresh();
+toast.success("Welcome back to StudioSpace!");
+
+const params = new URLSearchParams(window.location.search);
+const requestedPath = params.get("next");
+
+const destination =
+  requestedPath?.startsWith("/") &&
+  !requestedPath.startsWith("//") &&
+  !requestedPath.startsWith("/\\")
+    ? requestedPath
+    : "/";
+
+router.replace(destination);
+router.refresh();
     } catch (error) {
       toast.error(error.message || "Login failed");
     } finally {
