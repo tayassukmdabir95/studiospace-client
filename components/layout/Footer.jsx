@@ -14,13 +14,12 @@ const quickLinks = [
 ];
 
 const categories = [
-  { name: "Photo Studios", value: "Photo Studios" },
-  { name: "Sound Stages", value: "Sound Stages" },
-  { name: "Podcast Rooms", value: "Podcast Rooms" },
-  { name: "Music Suites", value: "Music Suites" },
-  { name: "Art Workshops", value: "Art Workshops" },
+  { name: "Photo Studios", value: "Photo Studio" },
+  { name: "Sound Stages", value: "Film Stage" },
+  { name: "Podcast Rooms", value: "Podcast Lounge" },
+  { name: "Music Suites", value: "Music Suite" },
+  { name: "Art Workshops", value: "Workshop" },
 ];
-
 export default function Footer() {
   const [email, setEmail] = useState("");
 
