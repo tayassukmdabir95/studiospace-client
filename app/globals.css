@@ -208,3 +208,30 @@ a {
     bottom: 18px !important;
   }
 }
+
+
+
+.studio-details-gallery .swiper-button-next,
+.studio-details-gallery .swiper-button-prev {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: #24231f;
+}
+
+.studio-details-gallery .swiper-button-next svg,
+.studio-details-gallery .swiper-button-prev svg {
+  width: 18px;
+  height: 18px;
+}
+
+.studio-details-gallery .swiper-pagination-bullet {
+  background: #ffffff;
+  opacity: 0.6;
+}
+
+.studio-details-gallery .swiper-pagination-bullet-active {
+  background: #e77b42;
+  opacity: 1;
+}
