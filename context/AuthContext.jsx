@@ -49,6 +49,21 @@ export function AuthProvider({ children }) {
     return data;
   }
 
+  async function googleLogin(credential) {
+  await apiRequest("/api/auth/google", {
+    method: "POST",
+    body: JSON.stringify({ credential }),
+  });
+
+  const currentUser = await refreshUser();
+
+  if (!currentUser) {
+    throw new Error("Could not restore your Google login session");
+  }
+
+  return currentUser;
+}
+
   async function register(userData) {
     return await apiRequest("/api/auth/register", {
       method: "POST",
@@ -70,6 +85,7 @@ export function AuthProvider({ children }) {
         user,
         loading,
         login,
+         googleLogin,
         register,
         logout,
         refreshUser,

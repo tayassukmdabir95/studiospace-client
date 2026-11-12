@@ -13,6 +13,7 @@ import {
   Aperture,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import GoogleLoginButton from "@/components/auth/GoogleLoginButton";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -219,16 +220,7 @@ router.refresh();
             <div className="h-px flex-1 bg-[var(--border)]" />
           </div>
 
-          <button
-            type="button"
-            onClick={() =>
-              toast.info("Google sign-in integration is coming next.")
-            }
-            className="flex w-full items-center justify-center gap-3 rounded-xl border border-[var(--border)] px-5 py-3.5 text-sm font-semibold transition-colors hover:bg-[var(--accent)]"
-          >
-            <span className="text-lg font-bold">G</span>
-            Continue with Google
-          </button>
+          <GoogleLoginButton />
 
           <p className="mt-8 text-center text-sm text-[var(--muted)]">
             New to StudioSpace?{" "}
