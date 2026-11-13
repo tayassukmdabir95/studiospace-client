@@ -6,6 +6,9 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
+import { useAuth } from "@/context/AuthContext";
+import BookingModal from "@/components/bookings/BookingModal";
+
 import {
   ArrowLeft,
   ArrowRight,
@@ -19,7 +22,6 @@ import {
   Users,
   UserRound,
   Wifi,
-  LoaderCircle,
   ImageOff,
 } from "lucide-react";
 
@@ -87,9 +89,12 @@ function DetailSkeleton() {
   return (
     <div className="container-shell section-space space-y-8">
       <div className="h-10 w-2/3 animate-pulse rounded-xl bg-[var(--accent)]" />
+
       <div className="aspect-[16/9] animate-pulse rounded-2xl bg-[var(--accent)]" />
+
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="h-72 animate-pulse rounded-2xl bg-[var(--accent)] lg:col-span-2" />
+
         <div className="h-72 animate-pulse rounded-2xl bg-[var(--accent)]" />
       </div>
     </div>
@@ -99,11 +104,13 @@ function DetailSkeleton() {
 export default function StudioDetails() {
   const { id } = useParams();
   const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
 
   const [studio, setStudio] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [retryCount, setRetryCount] = useState(0);
+  const [bookingOpen, setBookingOpen] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -157,6 +164,25 @@ export default function StudioDetails() {
     return () => controller.abort();
   }, [id, retryCount]);
 
+  function handleOpenBooking() {
+    if (authLoading) {
+      return;
+    }
+
+    if (!user) {
+      router.push(
+        `/login?next=${encodeURIComponent(`/studios/${id}`)}`
+      );
+      return;
+    }
+
+    setBookingOpen(true);
+  }
+
+  function handleCloseBooking() {
+    setBookingOpen(false);
+  }
+
   if (loading) {
     return <DetailSkeleton />;
   }
@@ -164,7 +190,10 @@ export default function StudioDetails() {
   if (error || !studio) {
     return (
       <section className="container-shell flex min-h-[65vh] flex-col items-center justify-center py-16 text-center">
-        <Aperture size={56} className="text-[var(--primary)]" />
+        <Aperture
+          size={56}
+          className="text-[var(--primary)]"
+        />
 
         <h1 className="mt-6 text-3xl font-bold">
           Unable to display this studio
@@ -194,13 +223,29 @@ export default function StudioDetails() {
   const location =
     typeof studio.location === "string"
       ? studio.location
-      : studio.location?.city || studio.address || "Not specified";
+      : studio.location?.city ||
+        studio.address ||
+        "Not specified";
 
-  const hourlyRate = Number(studio.hourlyRate);
-  const deposit = Number(studio.securityDeposit);
+  const hourlyRate =
+    studio.hourlyRate === null ||
+    studio.hourlyRate === undefined ||
+    studio.hourlyRate === ""
+      ? null
+      : Number(studio.hourlyRate);
+
+  const deposit =
+    studio.securityDeposit === null ||
+    studio.securityDeposit === undefined ||
+    studio.securityDeposit === ""
+      ? null
+      : Number(studio.securityDeposit);
+
   const rating = Number(studio.rating);
 
-  const hasRating = Number.isFinite(rating) && rating > 0;
+  const hasRating =
+    Number.isFinite(rating) && rating > 0;
+
   const amenities = Array.isArray(studio.amenities)
     ? studio.amenities
     : [];
@@ -229,7 +274,10 @@ export default function StudioDetails() {
 
         <div className="mt-5 flex flex-wrap items-center gap-5 text-sm text-[var(--muted)]">
           <span className="flex items-center gap-2">
-            <MapPin size={17} className="text-[var(--primary)]" />
+            <MapPin
+              size={17}
+              className="text-[var(--primary)]"
+            />
             {location}
           </span>
 
@@ -242,7 +290,10 @@ export default function StudioDetails() {
           </span>
 
           <span className="flex items-center gap-2">
-            <Users size={17} className="text-[var(--primary)]" />
+            <Users
+              size={17}
+              className="text-[var(--primary)]"
+            />
             Up to {capacity || "—"} guests
           </span>
         </div>
@@ -265,11 +316,16 @@ export default function StudioDetails() {
 
             <div className="mt-8 grid gap-4 border-t border-[var(--border)] pt-7 sm:grid-cols-2">
               <div className="flex items-center gap-3">
-                <Users size={22} className="text-[var(--primary)]" />
+                <Users
+                  size={22}
+                  className="text-[var(--primary)]"
+                />
+
                 <div>
                   <p className="text-xs text-[var(--muted)]">
                     Maximum Capacity
                   </p>
+
                   <p className="mt-1 font-semibold">
                     {capacity || "Not specified"} guests
                   </p>
@@ -277,11 +333,16 @@ export default function StudioDetails() {
               </div>
 
               <div className="flex items-center gap-3">
-                <Clock3 size={22} className="text-[var(--primary)]" />
+                <Clock3
+                  size={22}
+                  className="text-[var(--primary)]"
+                />
+
                 <div>
                   <p className="text-xs text-[var(--muted)]">
                     Rental Pricing
                   </p>
+
                   <p className="mt-1 font-semibold">
                     Hourly booking
                   </p>
@@ -298,9 +359,14 @@ export default function StudioDetails() {
             {amenities.length > 0 ? (
               <div className="mt-7 grid gap-5 sm:grid-cols-2">
                 {amenities.map((amenity, index) => (
-                  <div key={`${amenity}-${index}`} className="flex items-center gap-3">
+                  <div
+                    key={`${amenity}-${index}`}
+                    className="flex items-center gap-3"
+                  >
                     <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--accent)] text-[var(--primary)]">
-                      {amenity.toLowerCase().includes("wifi") ? (
+                      {String(amenity)
+                        .toLowerCase()
+                        .includes("wifi") ? (
                         <Wifi size={19} />
                       ) : (
                         <CheckCircle2 size={19} />
@@ -334,6 +400,7 @@ export default function StudioDetails() {
                 <p className="text-lg font-bold">
                   {studio.ownerName || "Studio Host"}
                 </p>
+
                 <p className="mt-1 text-sm text-[var(--muted)]">
                   StudioSpace host
                 </p>
@@ -362,7 +429,8 @@ export default function StudioDetails() {
               </h3>
 
               <p className="mt-2 text-sm text-[var(--muted)]">
-                Guest reviews have not been added for this studio yet.
+                Guest reviews have not been added
+                for this studio yet.
               </p>
             </div>
           </section>
@@ -376,16 +444,18 @@ export default function StudioDetails() {
 
             <div className="mt-2 flex items-end gap-2">
               <span className="text-4xl font-bold tracking-tight text-[var(--primary)]">
-                {Number.isFinite(hourlyRate)
+                {hourlyRate !== null &&
+                Number.isFinite(hourlyRate)
                   ? `$${hourlyRate.toLocaleString()}`
                   : "Ask host"}
               </span>
 
-              {Number.isFinite(hourlyRate) && (
-                <span className="pb-1 text-sm text-[var(--muted)]">
-                  / hour
-                </span>
-              )}
+              {hourlyRate !== null &&
+                Number.isFinite(hourlyRate) && (
+                  <span className="pb-1 text-sm text-[var(--muted)]">
+                    / hour
+                  </span>
+                )}
             </div>
           </div>
 
@@ -397,7 +467,8 @@ export default function StudioDetails() {
               </span>
 
               <span className="font-bold">
-                {Number.isFinite(deposit)
+                {deposit !== null &&
+                Number.isFinite(deposit)
                   ? `$${deposit.toLocaleString()}`
                   : "Not specified"}
               </span>
@@ -428,9 +499,9 @@ export default function StudioDetails() {
 
           <button
             type="button"
-            disabled
-            className="button-primary mt-8 w-full cursor-not-allowed opacity-60"
-            title="Booking will be enabled in the next step"
+            onClick={handleOpenBooking}
+            disabled={authLoading}
+            className="button-primary mt-8 w-full disabled:cursor-not-allowed disabled:opacity-50"
           >
             <CalendarDays size={18} />
             Book Workspace Now
@@ -438,10 +509,18 @@ export default function StudioDetails() {
           </button>
 
           <p className="mt-4 text-center text-xs leading-5 text-[var(--muted)]">
-            Booking will be enabled when we connect the reservation form.
+            Select your preferred date and hours to
+            request a reservation.
           </p>
         </aside>
       </div>
+
+      {bookingOpen && (
+        <BookingModal
+          studio={studio}
+          onClose={handleCloseBooking}
+        />
+      )}
     </main>
   );
 }
