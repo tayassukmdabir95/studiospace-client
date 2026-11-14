@@ -17,10 +17,11 @@ import {
   LoaderCircle,
   MapPin,
   ShieldCheck,
-  Users,
 } from "lucide-react";
+
 import { useAuth } from "@/context/AuthContext";
 import { apiRequest } from "@/lib/api";
+import StudioImageUploader from "@/components/studios/StudioImageUploader";
 
 const categories = [
   "Photo Studio",
@@ -106,14 +107,23 @@ export default function AddStudioPage() {
       !location ||
       !address ||
       !image ||
-      !description
+      !description ||
+      formData.hourlyRate === "" ||
+      formData.securityDeposit === "" ||
+      formData.maxCapacity === ""
     ) {
       toast.error("Please complete all required fields");
       return;
     }
 
-    if (!/^https?:\/\/.+/i.test(image)) {
-      toast.error("Please provide a valid image URL");
+    try {
+      const imageUrl = new URL(image);
+
+      if (!["http:", "https:"].includes(imageUrl.protocol)) {
+        throw new Error("Invalid image URL");
+      }
+    } catch {
+      toast.error("Please upload an image or enter a valid image URL");
       return;
     }
 
@@ -122,13 +132,24 @@ export default function AddStudioPage() {
       return;
     }
 
-    if (!Number.isFinite(securityDeposit) || securityDeposit < 0) {
+    if (
+      !Number.isFinite(securityDeposit) ||
+      securityDeposit < 0
+    ) {
       toast.error("Security deposit cannot be negative");
       return;
     }
 
-    if (!Number.isInteger(maxCapacity) || maxCapacity < 1) {
+    if (
+      !Number.isInteger(maxCapacity) ||
+      maxCapacity < 1
+    ) {
       toast.error("Capacity must be a positive whole number");
+      return;
+    }
+
+    if (description.length < 20) {
+      toast.error("Description must contain at least 20 characters");
       return;
     }
 
@@ -154,10 +175,13 @@ export default function AddStudioPage() {
       });
 
       toast.success("Your studio has been published successfully!");
+
       router.push("/my-listings");
       router.refresh();
     } catch (error) {
-      toast.error(error.message || "Failed to add studio");
+      toast.error(
+        error.message || "Failed to add studio"
+      );
     } finally {
       setSubmitting(false);
     }
@@ -187,8 +211,8 @@ export default function AddStudioPage() {
         </h1>
 
         <p className="mt-5 text-base leading-8 text-[var(--muted)]">
-          Share your studio with creators looking for the perfect
-          place to bring their ideas to life.
+          Share your studio with creators looking for the
+          perfect place to bring their ideas to life.
         </p>
       </div>
 
@@ -247,10 +271,15 @@ export default function AddStudioPage() {
                   className="input-field"
                   required
                 >
-                  <option value="">Select a category</option>
+                  <option value="">
+                    Select a category
+                  </option>
 
                   {categories.map((category) => (
-                    <option key={category} value={category}>
+                    <option
+                      key={category}
+                      value={category}
+                    >
                       {category}
                     </option>
                   ))}
@@ -428,61 +457,21 @@ export default function AddStudioPage() {
               </h2>
             </div>
 
-            <label
-              htmlFor="studio-image"
-              className="mb-2 block text-sm font-semibold"
-            >
-              Hosted Image URL *
-            </label>
-
-            <input
-              id="studio-image"
-              name="image"
-              type="url"
+            <StudioImageUploader
               value={formData.image}
-              onChange={handleChange}
-              placeholder="https://example.com/studio.jpg"
-              className="input-field"
-              required
+              onChange={(imageUrl) =>
+                setFormData((previous) => ({
+                  ...previous,
+                  image: imageUrl,
+                }))
+              }
             />
 
-            <p className="mt-3 text-xs leading-6 text-[var(--muted)]">
-              Upload an image to{" "}
-              <a
-                href="https://postimages.org/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-semibold text-[var(--primary)] hover:underline"
-              >
-                Postimages
-              </a>{" "}
-              or{" "}
-              <a
-                href="https://imgbb.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-semibold text-[var(--primary)] hover:underline"
-              >
-                ImgBB
-              </a>
-              , then paste its direct image URL here.
+            <p className="mt-4 text-xs leading-6 text-[var(--muted)]">
+              Add a clear photo of your creative workspace.
+              Your image will be hosted online and its URL
+              will be saved with your studio listing.
             </p>
-
-            {formData.image.trim() && (
-              <div className="mt-5 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--accent)]">
-                <img
-                  src={formData.image.trim()}
-                  alt="Studio image preview"
-                  className="aspect-video w-full object-cover"
-                  onError={(event) => {
-                    event.currentTarget.style.display = "none";
-                  }}
-                  onLoad={(event) => {
-                    event.currentTarget.style.display = "block";
-                  }}
-                />
-              </div>
-            )}
           </div>
 
           <div className="surface-card p-6 sm:p-9">
@@ -531,14 +520,15 @@ export default function AddStudioPage() {
               size={22}
               className="text-[var(--primary)]"
             />
+
             <h2 className="text-lg font-bold">
               Host Information
             </h2>
           </div>
 
           <p className="mb-5 text-sm leading-7 text-[var(--muted)]">
-            Your account information will be attached to this
-            listing automatically.
+            Your account information will be attached
+            to this listing automatically.
           </p>
 
           <div className="space-y-4">
@@ -582,19 +572,22 @@ export default function AddStudioPage() {
             />
 
             <p className="text-xs leading-6 text-[var(--muted)]">
-              Provide accurate studio details and clear images
-              so creators know what to expect.
+              Provide accurate studio details and clear
+              images so creators know what to expect.
             </p>
           </div>
 
           <button
             type="submit"
-            disabled={submitting}
+            disabled={submitting || !formData.image.trim()}
             className="button-primary mt-7 w-full disabled:cursor-not-allowed disabled:opacity-50"
           >
             {submitting ? (
               <>
-                <LoaderCircle size={18} className="animate-spin" />
+                <LoaderCircle
+                  size={18}
+                  className="animate-spin"
+                />
                 Publishing...
               </>
             ) : (

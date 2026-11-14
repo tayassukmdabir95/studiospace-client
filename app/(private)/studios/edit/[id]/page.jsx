@@ -13,8 +13,10 @@ import {
   ImagePlus,
   ShieldCheck,
 } from "lucide-react";
+
 import { useAuth } from "@/context/AuthContext";
 import { apiRequest } from "@/lib/api";
+import StudioImageUploader from "@/components/studios/StudioImageUploader";
 
 const categories = [
   "Photo Studio",
@@ -113,11 +115,15 @@ export default function EditStudioPage() {
         });
 
         setAmenities(
-          Array.isArray(studio.amenities) ? studio.amenities : []
+          Array.isArray(studio.amenities)
+            ? studio.amenities
+            : []
         );
       } catch (err) {
         if (!controller.signal.aborted) {
-          setError(err.message || "Failed to load studio");
+          setError(
+            err.message || "Failed to load studio"
+          );
         }
       } finally {
         if (!controller.signal.aborted) {
@@ -151,6 +157,11 @@ export default function EditStudioPage() {
   async function handleSubmit(event) {
     event.preventDefault();
 
+    if (!user?.email) {
+      toast.error("Please log in to update this studio");
+      return;
+    }
+
     const title = formData.title.trim();
     const location = formData.location.trim();
     const address = formData.address.trim();
@@ -183,49 +194,73 @@ export default function EditStudioPage() {
         throw new Error("Invalid URL");
       }
     } catch {
-      toast.error("Please enter a valid image URL");
+      toast.error(
+        "Please upload an image or provide a valid image URL"
+      );
       return;
     }
 
-    if (!Number.isFinite(hourlyRate) || hourlyRate <= 0) {
+    if (
+      !Number.isFinite(hourlyRate) ||
+      hourlyRate <= 0
+    ) {
       toast.error("Hourly rate must be greater than zero");
       return;
     }
 
-    if (!Number.isFinite(securityDeposit) || securityDeposit < 0) {
+    if (
+      !Number.isFinite(securityDeposit) ||
+      securityDeposit < 0
+    ) {
       toast.error("Security deposit cannot be negative");
       return;
     }
 
-    if (!Number.isInteger(maxCapacity) || maxCapacity < 1) {
+    if (
+      !Number.isInteger(maxCapacity) ||
+      maxCapacity < 1
+    ) {
       toast.error("Capacity must be a positive whole number");
+      return;
+    }
+
+    if (description.length < 20) {
+      toast.error(
+        "Description must contain at least 20 characters"
+      );
       return;
     }
 
     setSubmitting(true);
 
     try {
-      await apiRequest(`/api/studios/${encodeURIComponent(id)}`, {
-        method: "PUT",
-        body: JSON.stringify({
-          title,
-          category: formData.category,
-          hourlyRate,
-          securityDeposit,
-          maxCapacity,
-          location,
-          address,
-          image,
-          amenities,
-          description,
-        }),
-      });
+      await apiRequest(
+        `/api/studios/${encodeURIComponent(id)}`,
+        {
+          method: "PUT",
+          body: JSON.stringify({
+            title,
+            category: formData.category,
+            hourlyRate,
+            securityDeposit,
+            maxCapacity,
+            location,
+            address,
+            image,
+            amenities,
+            description,
+          }),
+        }
+      );
 
       toast.success("Studio updated successfully!");
+
       router.replace("/my-listings");
       router.refresh();
     } catch (err) {
-      toast.error(err.message || "Failed to update studio");
+      toast.error(
+        err.message || "Failed to update studio"
+      );
     } finally {
       setSubmitting(false);
     }
@@ -238,6 +273,7 @@ export default function EditStudioPage() {
           size={30}
           className="animate-spin text-[var(--primary)]"
         />
+
         <p className="text-sm text-[var(--muted)]">
           Loading studio information...
         </p>
@@ -248,7 +284,10 @@ export default function EditStudioPage() {
   if (error) {
     return (
       <section className="container-shell flex min-h-[65vh] flex-col items-center justify-center text-center">
-        <ShieldCheck size={48} className="text-[var(--primary)]" />
+        <ShieldCheck
+          size={48}
+          className="text-[var(--primary)]"
+        />
 
         <h1 className="mt-6 text-2xl font-bold">
           Cannot edit this studio
@@ -258,7 +297,10 @@ export default function EditStudioPage() {
           {error}
         </p>
 
-        <Link href="/my-listings" className="button-primary mt-7">
+        <Link
+          href="/my-listings"
+          className="button-primary mt-7"
+        >
           Back to My Listings
         </Link>
       </section>
@@ -269,21 +311,27 @@ export default function EditStudioPage() {
     <section className="container-shell py-12 sm:py-16">
       <Link
         href="/my-listings"
-        className="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-[var(--muted)]"
+        className="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-[var(--muted)] hover:text-[var(--primary)]"
       >
         <ArrowLeft size={17} />
         Back to My Listings
       </Link>
 
       <div className="mb-10">
-        <span className="eyebrow">MANAGE YOUR CREATIVE SPACE</span>
+        <span className="eyebrow">
+          MANAGE YOUR CREATIVE SPACE
+        </span>
 
         <h1 className="display-title mt-4">
-          Edit <span className="text-[var(--primary)]">Studio</span>
+          Edit{" "}
+          <span className="text-[var(--primary)]">
+            Studio
+          </span>
         </h1>
 
         <p className="mt-4 text-sm text-[var(--muted)]">
-          Update the details of your existing studio listing.
+          Update your studio information, pricing,
+          amenities, and photos.
         </p>
       </div>
 
@@ -294,17 +342,25 @@ export default function EditStudioPage() {
         <div className="space-y-7">
           <div className="surface-card space-y-6 p-6 sm:p-9">
             <h2 className="flex items-center gap-3 text-xl font-bold">
-              <Pencil size={22} className="text-[var(--primary)]" />
+              <Pencil
+                size={22}
+                className="text-[var(--primary)]"
+              />
               Basic Information
             </h2>
 
             <div>
-              <label htmlFor="edit-title" className="mb-2 block text-sm font-semibold">
+              <label
+                htmlFor="edit-title"
+                className="mb-2 block text-sm font-semibold"
+              >
                 Studio Title *
               </label>
+
               <input
                 id="edit-title"
                 name="title"
+                type="text"
                 value={formData.title}
                 onChange={handleChange}
                 maxLength={120}
@@ -314,9 +370,13 @@ export default function EditStudioPage() {
             </div>
 
             <div>
-              <label htmlFor="edit-category" className="mb-2 block text-sm font-semibold">
+              <label
+                htmlFor="edit-category"
+                className="mb-2 block text-sm font-semibold"
+              >
                 Category *
               </label>
+
               <select
                 id="edit-category"
                 name="category"
@@ -325,9 +385,15 @@ export default function EditStudioPage() {
                 className="input-field"
                 required
               >
-                <option value="">Select a category</option>
+                <option value="">
+                  Select a category
+                </option>
+
                 {categories.map((category) => (
-                  <option key={category} value={category}>
+                  <option
+                    key={category}
+                    value={category}
+                  >
                     {category}
                   </option>
                 ))}
@@ -335,9 +401,13 @@ export default function EditStudioPage() {
             </div>
 
             <div>
-              <label htmlFor="edit-description" className="mb-2 block text-sm font-semibold">
+              <label
+                htmlFor="edit-description"
+                className="mb-2 block text-sm font-semibold"
+              >
                 Detailed Overview *
               </label>
+
               <textarea
                 id="edit-description"
                 name="description"
@@ -402,15 +472,22 @@ export default function EditStudioPage() {
           </div>
 
           <div className="surface-card space-y-5 p-6 sm:p-9">
-            <h2 className="text-xl font-bold">Location</h2>
+            <h2 className="text-xl font-bold">
+              Location
+            </h2>
 
             <div>
-              <label htmlFor="edit-location" className="mb-2 block text-sm font-semibold">
+              <label
+                htmlFor="edit-location"
+                className="mb-2 block text-sm font-semibold"
+              >
                 Area / City *
               </label>
+
               <input
                 id="edit-location"
                 name="location"
+                type="text"
                 value={formData.location}
                 onChange={handleChange}
                 className="input-field"
@@ -419,12 +496,17 @@ export default function EditStudioPage() {
             </div>
 
             <div>
-              <label htmlFor="edit-address" className="mb-2 block text-sm font-semibold">
+              <label
+                htmlFor="edit-address"
+                className="mb-2 block text-sm font-semibold"
+              >
                 Full Address *
               </label>
+
               <input
                 id="edit-address"
                 name="address"
+                type="text"
                 value={formData.address}
                 onChange={handleChange}
                 className="input-field"
@@ -435,32 +517,28 @@ export default function EditStudioPage() {
 
           <div className="surface-card p-6 sm:p-9">
             <h2 className="mb-6 flex items-center gap-3 text-xl font-bold">
-              <ImagePlus size={23} className="text-[var(--primary)]" />
+              <ImagePlus
+                size={23}
+                className="text-[var(--primary)]"
+              />
               Studio Image
             </h2>
 
-            <label htmlFor="edit-image" className="mb-2 block text-sm font-semibold">
-              Image URL *
-            </label>
-            <input
-              id="edit-image"
-              name="image"
-              type="url"
+            <StudioImageUploader
               value={formData.image}
-              onChange={handleChange}
-              className="input-field"
-              required
+              onChange={(imageUrl) =>
+                setFormData((previous) => ({
+                  ...previous,
+                  image: imageUrl,
+                }))
+              }
             />
 
-            {formData.image && (
-              <div className="mt-5 overflow-hidden rounded-xl bg-[var(--accent)]">
-                <img
-                  src={formData.image}
-                  alt="Studio preview"
-                  className="aspect-video w-full object-cover"
-                />
-              </div>
-            )}
+            <p className="mt-4 text-xs leading-6 text-[var(--muted)]">
+              Your existing studio image is loaded
+              automatically. Upload a new image to replace it,
+              or paste a different hosted image URL.
+            </p>
           </div>
 
           <div className="surface-card p-6 sm:p-9">
@@ -468,11 +546,16 @@ export default function EditStudioPage() {
               Available Amenities
             </h2>
 
+            <p className="mb-6 text-sm text-[var(--muted)]">
+              Select the amenities currently available
+              in your studio.
+            </p>
+
             <div className="grid gap-3 sm:grid-cols-2">
               {amenityOptions.map((amenity) => (
                 <label
                   key={amenity}
-                  className={`flex cursor-pointer items-center gap-3 rounded-xl border p-4 text-sm ${
+                  className={`flex cursor-pointer items-center gap-3 rounded-xl border p-4 text-sm font-medium transition-colors ${
                     amenities.includes(amenity)
                       ? "border-[var(--primary)] bg-[var(--accent)]"
                       : "border-[var(--border)]"
@@ -481,9 +564,12 @@ export default function EditStudioPage() {
                   <input
                     type="checkbox"
                     checked={amenities.includes(amenity)}
-                    onChange={() => toggleAmenity(amenity)}
+                    onChange={() =>
+                      toggleAmenity(amenity)
+                    }
                     className="h-4 w-4 accent-[var(--primary)]"
                   />
+
                   {amenity}
                 </label>
               ))}
@@ -493,15 +579,22 @@ export default function EditStudioPage() {
 
         <aside className="surface-card p-6 lg:sticky lg:top-28">
           <h2 className="mb-6 flex items-center gap-2 text-lg font-bold">
-            <ShieldCheck size={21} className="text-[var(--primary)]" />
+            <ShieldCheck
+              size={21}
+              className="text-[var(--primary)]"
+            />
             Host Information
           </h2>
 
           <div className="space-y-5">
             <div>
-              <label htmlFor="edit-owner-name" className="mb-2 block text-sm font-semibold">
+              <label
+                htmlFor="edit-owner-name"
+                className="mb-2 block text-sm font-semibold"
+              >
                 Host Name
               </label>
+
               <input
                 id="edit-owner-name"
                 value={user?.name || ""}
@@ -511,9 +604,13 @@ export default function EditStudioPage() {
             </div>
 
             <div>
-              <label htmlFor="edit-owner-email" className="mb-2 block text-sm font-semibold">
+              <label
+                htmlFor="edit-owner-email"
+                className="mb-2 block text-sm font-semibold"
+              >
                 Host Email
               </label>
+
               <input
                 id="edit-owner-email"
                 value={user?.email || ""}
@@ -524,17 +621,24 @@ export default function EditStudioPage() {
           </div>
 
           <p className="mt-6 text-xs leading-6 text-[var(--muted)]">
-            Your host identity cannot be changed from this form.
+            Your host identity cannot be changed
+            from this form.
           </p>
 
           <button
             type="submit"
-            disabled={submitting}
-            className="button-primary mt-7 w-full disabled:opacity-50"
+            disabled={
+              submitting ||
+              !formData.image.trim()
+            }
+            className="button-primary mt-7 w-full disabled:cursor-not-allowed disabled:opacity-50"
           >
             {submitting ? (
               <>
-                <LoaderCircle size={18} className="animate-spin" />
+                <LoaderCircle
+                  size={18}
+                  className="animate-spin"
+                />
                 Saving Changes...
               </>
             ) : (
