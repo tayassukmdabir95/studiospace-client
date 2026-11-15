@@ -1,9 +1,11 @@
+
 "use client";
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+
 import {
   ArrowRight,
   Eye,
@@ -15,6 +17,7 @@ import {
   CheckCircle2,
   Aperture,
 } from "lucide-react";
+
 import { useAuth } from "@/context/AuthContext";
 import GoogleLoginButton from "@/components/auth/GoogleLoginButton";
 
@@ -83,10 +86,15 @@ export default function RegisterPage() {
         password: formData.password,
       });
 
-      toast.success("Account created successfully! Please log in.");
+      toast.success(
+        "Account created successfully! Please log in."
+      );
+
       router.push("/login");
     } catch (error) {
-      toast.error(error.message || "Registration failed");
+      toast.error(
+        error.message || "Registration failed"
+      );
     } finally {
       setSubmitting(false);
     }
@@ -95,6 +103,7 @@ export default function RegisterPage() {
   return (
     <section className="container-shell flex min-h-[75vh] items-center justify-center py-14">
       <div className="grid w-full max-w-5xl overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--surface)] shadow-xl shadow-black/5 lg:grid-cols-2">
+
         <div className="relative hidden flex-col justify-between overflow-hidden bg-[#24231f] p-12 text-white lg:flex">
           <div className="absolute -right-20 -bottom-20 h-80 w-80 rounded-full bg-[#e77b42]/20 blur-3xl" />
 
@@ -102,17 +111,22 @@ export default function RegisterPage() {
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#e77b42]">
               <Aperture size={28} />
             </div>
+
             <span className="text-2xl font-bold tracking-tight">
               StudioSpace
             </span>
           </div>
 
           <div className="relative z-10 my-20">
-            <span className="eyebrow">JOIN THE CREATIVE COMMUNITY</span>
+            <span className="eyebrow">
+              JOIN THE CREATIVE COMMUNITY
+            </span>
 
             <h2 className="mt-5 text-5xl leading-tight font-bold tracking-tight">
               Your next big idea
-              <span className="text-[#f08a50]"> starts here.</span>
+              <span className="text-[#f08a50]">
+                {" "}starts here.
+              </span>
             </h2>
 
             <p className="mt-6 max-w-sm text-base leading-8 text-white/60">
@@ -129,7 +143,9 @@ export default function RegisterPage() {
 
         <div className="px-6 py-10 sm:px-12 lg:px-14">
           <div className="mb-7">
-            <span className="eyebrow">GET STARTED</span>
+            <span className="eyebrow">
+              GET STARTED
+            </span>
 
             <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
               Create your account
@@ -140,7 +156,10 @@ export default function RegisterPage() {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-4"
+          >
             <div>
               <label
                 htmlFor="register-name"
@@ -149,10 +168,12 @@ export default function RegisterPage() {
                 Full Name
               </label>
 
-              <div className="relative">
+              <div className="relative w-full">
                 <UserRound
-                  size={18}
-                  className="absolute top-1/2 left-4 -translate-y-1/2 text-[var(--muted)]"
+                  size={19}
+                  strokeWidth={1.8}
+                  aria-hidden="true"
+                  className="pointer-events-none absolute top-1/2 left-4 z-10 -translate-y-1/2 text-[var(--muted)]"
                 />
 
                 <input
@@ -163,7 +184,11 @@ export default function RegisterPage() {
                   onChange={handleChange}
                   placeholder="Your full name"
                   autoComplete="name"
-                  className="input-field pl-11"
+                  className="input-field w-full pl-12 pr-4"
+                  style={{
+                    paddingLeft: "3.25rem",
+                    paddingRight: "1rem",
+                  }}
                   required
                 />
               </div>
@@ -177,10 +202,12 @@ export default function RegisterPage() {
                 Email Address
               </label>
 
-              <div className="relative">
+              <div className="relative w-full">
                 <Mail
-                  size={18}
-                  className="absolute top-1/2 left-4 -translate-y-1/2 text-[var(--muted)]"
+                  size={19}
+                  strokeWidth={1.8}
+                  aria-hidden="true"
+                  className="pointer-events-none absolute top-1/2 left-4 z-10 -translate-y-1/2 text-[var(--muted)]"
                 />
 
                 <input
@@ -191,7 +218,11 @@ export default function RegisterPage() {
                   onChange={handleChange}
                   placeholder="you@example.com"
                   autoComplete="email"
-                  className="input-field pl-11"
+                  className="input-field w-full pl-12 pr-4"
+                  style={{
+                    paddingLeft: "3.25rem",
+                    paddingRight: "1rem",
+                  }}
                   required
                 />
               </div>
@@ -205,10 +236,12 @@ export default function RegisterPage() {
                 Profile Photo URL
               </label>
 
-              <div className="relative">
+              <div className="relative w-full">
                 <ImagePlus
-                  size={18}
-                  className="absolute top-1/2 left-4 -translate-y-1/2 text-[var(--muted)]"
+                  size={19}
+                  strokeWidth={1.8}
+                  aria-hidden="true"
+                  className="pointer-events-none absolute top-1/2 left-4 z-10 -translate-y-1/2 text-[var(--muted)]"
                 />
 
                 <input
@@ -218,7 +251,11 @@ export default function RegisterPage() {
                   value={formData.photoURL}
                   onChange={handleChange}
                   placeholder="https://example.com/photo.jpg"
-                  className="input-field pl-11"
+                  className="input-field w-full pl-12 pr-4"
+                  style={{
+                    paddingLeft: "3.25rem",
+                    paddingRight: "1rem",
+                  }}
                   required
                 />
               </div>
@@ -232,40 +269,57 @@ export default function RegisterPage() {
                 Password
               </label>
 
-              <div className="relative">
+              <div className="relative w-full">
                 <LockKeyhole
-                  size={18}
-                  className="absolute top-1/2 left-4 -translate-y-1/2 text-[var(--muted)]"
+                  size={19}
+                  strokeWidth={1.8}
+                  aria-hidden="true"
+                  className="pointer-events-none absolute top-1/2 left-4 z-10 -translate-y-1/2 text-[var(--muted)]"
                 />
 
                 <input
                   id="register-password"
                   name="password"
-                  type={showPassword ? "text" : "password"}
+                  type={
+                    showPassword
+                      ? "text"
+                      : "password"
+                  }
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Create a strong password"
                   autoComplete="new-password"
-                  className="input-field pr-12 pl-11"
+                  className="input-field w-full pl-12 pr-12"
+                  style={{
+                    paddingLeft: "3.25rem",
+                    paddingRight: "3.5rem",
+                  }}
                   aria-invalid={Boolean(passwordError)}
                   aria-describedby={
-                    passwordError ? "password-error" : undefined
+                    passwordError
+                      ? "password-error"
+                      : undefined
                   }
                   required
                 />
 
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  aria-label={
-                    showPassword ? "Hide password" : "Show password"
+                  onClick={() =>
+                    setShowPassword((prev) => !prev)
                   }
-                  className="absolute top-1/2 right-4 -translate-y-1/2 text-[var(--muted)]"
+                  aria-label={
+                    showPassword
+                      ? "Hide password"
+                      : "Show password"
+                  }
+                  aria-pressed={showPassword}
+                  className="absolute top-1/2 right-4 z-10 flex -translate-y-1/2 items-center justify-center text-[var(--muted)] transition-colors hover:text-[var(--primary)]"
                 >
                   {showPassword ? (
-                    <EyeOff size={18} />
+                    <EyeOff size={19} />
                   ) : (
-                    <Eye size={18} />
+                    <Eye size={19} />
                   )}
                 </button>
               </div>
@@ -314,16 +368,23 @@ export default function RegisterPage() {
               disabled={submitting}
               className="button-primary mt-3 w-full disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {submitting ? "Creating account..." : "Create Account"}
-              {!submitting && <ArrowRight size={17} />}
+              {submitting
+                ? "Creating account..."
+                : "Create Account"}
+
+              {!submitting && (
+                <ArrowRight size={17} />
+              )}
             </button>
           </form>
 
           <div className="my-6 flex items-center gap-4">
             <div className="h-px flex-1 bg-[var(--border)]" />
+
             <span className="text-xs text-[var(--muted)]">
               OR CONTINUE WITH
             </span>
+
             <div className="h-px flex-1 bg-[var(--border)]" />
           </div>
 
