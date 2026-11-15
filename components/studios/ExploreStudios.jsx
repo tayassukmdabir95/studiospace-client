@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+
 import {
   Aperture,
   ArrowRight,
@@ -12,7 +13,9 @@ import {
   Search,
   SlidersHorizontal,
   LoaderCircle,
+  ChevronDown,
 } from "lucide-react";
+
 import StudioCard from "./StudioCard";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -130,9 +133,10 @@ export default function ExploreStudios() {
     const category = event.target.value;
 
     if (category) {
-      router.replace(`/studios?category=${encodeURIComponent(category)}`, {
-        scroll: false,
-      });
+      router.replace(
+        `/studios?category=${encodeURIComponent(category)}`,
+        { scroll: false }
+      );
     } else {
       router.replace("/studios", { scroll: false });
     }
@@ -151,6 +155,7 @@ export default function ExploreStudios() {
         <div className="container-shell relative z-10">
           <div className="mb-5 flex items-center gap-2 text-[#f08a50]">
             <Aperture size={18} />
+
             <span className="text-xs font-bold tracking-[0.18em]">
               THE CREATIVE MARKETPLACE
             </span>
@@ -158,7 +163,9 @@ export default function ExploreStudios() {
 
           <h1 className="text-4xl font-bold tracking-[-0.06em] sm:text-5xl lg:text-6xl">
             Find your perfect
-            <span className="text-[#f08a50]"> creative space.</span>
+            <span className="text-[#f08a50]">
+              {" "}creative space.
+            </span>
           </h1>
 
           <p className="mt-6 max-w-2xl text-base leading-8 text-white/65">
@@ -170,8 +177,12 @@ export default function ExploreStudios() {
             <Link href="/" className="hover:text-white">
               Home
             </Link>
+
             <ArrowRight size={14} />
-            <span className="text-[#f08a50]">Explore Studios</span>
+
+            <span className="text-[#f08a50]">
+              Explore Studios
+            </span>
           </div>
         </div>
       </section>
@@ -180,51 +191,81 @@ export default function ExploreStudios() {
         <div className="container-shell">
           <div className="mb-9 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-sm sm:p-6">
             <div className="mb-5 flex items-center gap-2">
-              <SlidersHorizontal size={20} className="text-[var(--primary)]" />
-              <h2 className="text-lg font-bold">Find a Workspace</h2>
+              <SlidersHorizontal
+                size={20}
+                className="text-[var(--primary)]"
+              />
+
+              <h2 className="text-lg font-bold">
+                Find a Workspace
+              </h2>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-[1fr_260px_auto] md:items-end">
-              <div>
-                <label htmlFor="studio-search" className="mb-2 block text-sm font-semibold">
+            <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_260px_auto] md:items-end">
+              <div className="min-w-0">
+                <label
+                  htmlFor="studio-search"
+                  className="mb-2 block text-sm font-semibold"
+                >
                   Search Studios
                 </label>
 
-                <div className="relative">
+                <div className="relative w-full">
                   <Search
-                    size={18}
-                    className="absolute top-1/2 left-4 -translate-y-1/2 text-[var(--muted)]"
+                    size={19}
+                    strokeWidth={1.8}
+                    aria-hidden="true"
+                    className="pointer-events-none absolute top-1/2 left-4 z-10 -translate-y-1/2 text-[var(--muted)]"
                   />
 
                   <input
                     id="studio-search"
                     type="search"
                     value={search}
-                    onChange={(event) => setSearch(event.target.value)}
+                    onChange={(event) =>
+                      setSearch(event.target.value)
+                    }
                     placeholder="Search by name, category or location"
-                    className="input-field pl-11"
+                    className="input-field w-full min-w-0 pl-12 pr-4"
+                    style={{
+                      paddingLeft: "3.25rem",
+                      paddingRight: "1rem",
+                    }}
                   />
                 </div>
               </div>
 
-              <div>
-                <label htmlFor="studio-category" className="mb-2 block text-sm font-semibold">
+              <div className="min-w-0">
+                <label
+                  htmlFor="studio-category"
+                  className="mb-2 block text-sm font-semibold"
+                >
                   Category
                 </label>
 
-                <div className="relative">
+                <div className="relative w-full">
                   <Filter
-                    size={17}
-                    className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-[var(--muted)]"
+                    size={18}
+                    strokeWidth={1.8}
+                    aria-hidden="true"
+                    className="pointer-events-none absolute top-1/2 left-4 z-10 -translate-y-1/2 text-[var(--muted)]"
                   />
 
                   <select
                     id="studio-category"
                     value={selectedCategory}
                     onChange={handleCategoryChange}
-                    className="input-field pl-11"
+                    className="input-field w-full min-w-0 appearance-none pl-12 pr-10"
+                    style={{
+                      paddingLeft: "3.25rem",
+                      paddingRight: "2.75rem",
+                      appearance: "none",
+                    }}
                   >
-                    {!categories.some((category) => category.value === selectedCategory) &&
+                    {!categories.some(
+                      (category) =>
+                        category.value === selectedCategory
+                    ) &&
                       selectedCategory && (
                         <option value={selectedCategory}>
                           {selectedCategory}
@@ -232,18 +273,27 @@ export default function ExploreStudios() {
                       )}
 
                     {categories.map((category) => (
-                      <option key={category.label} value={category.value}>
+                      <option
+                        key={category.label}
+                        value={category.value}
+                      >
                         {category.label}
                       </option>
                     ))}
                   </select>
+
+                  <ChevronDown
+                    size={18}
+                    aria-hidden="true"
+                    className="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-[var(--muted)]"
+                  />
                 </div>
               </div>
 
               <button
                 type="button"
                 onClick={clearFilters}
-                className="button-secondary h-[50px]"
+                className="button-secondary h-[50px] w-full whitespace-nowrap md:w-auto"
               >
                 <RotateCcw size={16} className="mr-2" />
                 Reset
@@ -263,7 +313,9 @@ export default function ExploreStudios() {
                   : error
                     ? "Could not retrieve studio listings"
                     : `${filteredStudios.length} ${
-                        filteredStudios.length === 1 ? "studio" : "studios"
+                        filteredStudios.length === 1
+                          ? "studio"
+                          : "studios"
                       } found`}
               </p>
             </div>
@@ -283,7 +335,10 @@ export default function ExploreStudios() {
             </div>
           ) : error ? (
             <div className="flex flex-col items-center rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-6 py-16 text-center">
-              <LoaderCircle size={40} className="text-[var(--primary)]" />
+              <LoaderCircle
+                size={40}
+                className="text-[var(--primary)]"
+              />
 
               <h3 className="mt-5 text-xl font-bold">
                 Unable to load studios
@@ -295,7 +350,9 @@ export default function ExploreStudios() {
 
               <button
                 type="button"
-                onClick={() => setRetryCount((count) => count + 1)}
+                onClick={() =>
+                  setRetryCount((count) => count + 1)
+                }
                 className="button-primary mt-6"
               >
                 Try Again
@@ -312,8 +369,9 @@ export default function ExploreStudios() {
               </h3>
 
               <p className="mt-4 max-w-md text-sm leading-7 text-[var(--muted)]">
-                We couldn't find studios matching your search or category.
-                Try another keyword or explore all available spaces.
+                We could not find studios matching your search
+                or category. Try another keyword or explore
+                all available spaces.
               </p>
 
               <button
@@ -328,7 +386,10 @@ export default function ExploreStudios() {
           ) : (
             <div className="grid gap-7 sm:grid-cols-2 lg:grid-cols-3">
               {filteredStudios.map((studio) => (
-                <StudioCard key={studio._id} studio={studio} />
+                <StudioCard
+                  key={studio._id}
+                  studio={studio}
+                />
               ))}
             </div>
           )}
